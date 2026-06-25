@@ -108,6 +108,8 @@ svg { display:block; }
 .b-pr-urgent{background:var(--red-50);color:var(--red-600)} .b-pr-high{background:#fff7ed;color:#ea580c}
 .b-pr-normal{background:var(--gray-100);color:var(--gray-500)} .b-pr-low{background:#f8fafc;color:#94a3b8}
 .b-plain-red{background:var(--red-50);color:var(--red-600)} .b-plain-amber{background:var(--amber-50);color:var(--amber-600)}
+.b-plain-green{background:#ecfdf5;color:#059669} .b-plain-gray{background:var(--gray-100);color:var(--gray-500)}
+.nara-table { min-width:1040px; }
 
 .field-label { display:block; margin-bottom:4px; font-size:12px; font-weight:500; color:var(--gray-500); }
 .input, .select, .textarea {

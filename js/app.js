@@ -81,6 +81,8 @@
       view.innerHTML = WM.renderCalendar(App.tasks, App.cal.y, App.cal.m);
     } else if (r.page === "templates") {
       view.innerHTML = WM.renderTemplates(App.tplEdit);
+    } else if (r.page === "narajangteo") {
+      view.innerHTML = WM.renderNarajangteo();
     } else if (r.page === "settings") {
       view.innerHTML = WM.renderSettings(App.tasks);
       bindSettings();
@@ -119,6 +121,7 @@
     { href: "#/tasks", page: "tasks", label: "Tasks", icon: "list" },
     { href: "#/calendar", page: "calendar", label: "Calendar", icon: "calendar" },
     { href: "#/templates", page: "templates", label: "Templates", icon: "filestack" },
+    { href: "#/narajangteo", page: "narajangteo", label: "나라장터", icon: "gavel" },
     { href: "#/settings", page: "settings", label: "Settings", icon: "settings" }
   ];
 
@@ -742,8 +745,51 @@
     }
   });
 
+  /* ---- 전역 단축키 ---- */
+  function isTypingTarget(el) {
+    if (!el) return false;
+    if (el.isContentEditable) return true;
+    var tag = el.tagName;
+    return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+  }
+
+  function handleGlobalShortcut(e) {
+    // 입력 중·조합키·모달 열림 상태에서는 단축키 비활성화
+    if (e.ctrlKey || e.metaKey || e.altKey) return false;
+    if (isTypingTarget(e.target)) return false;
+    if (App.form) return false;                              // 업무 등록/수정 모달
+    if (document.getElementById("confirm-root").innerHTML) return false; // 확인 모달
+
+    var key = e.key.toLowerCase();
+
+    // 어디서나 동작하는 단축키
+    var GLOBAL = {
+      "n": function () {
+        if (route().page !== "tasks") location.hash = "#/tasks";
+        openForm(null);
+      },
+      "t": function () { location.hash = "#/tasks"; },
+      "c": function () { location.hash = "#/calendar"; },
+      "p": function () { location.hash = "#/templates"; }
+    };
+    if (GLOBAL[key]) { e.preventDefault(); GLOBAL[key](); return true; }
+
+    // 업무 상세 페이지에서만 동작하는 단축키
+    if (route().page === "task") {
+      if (key === "e") {
+        var editBtn = document.querySelector("[data-action='edit-task']");
+        if (editBtn) { e.preventDefault(); editBtn.click(); return true; }
+      } else if (e.key === "Delete" || e.key === "Backspace") {
+        var delBtn = document.querySelector("[data-action='delete-task-detail']");
+        if (delBtn) { e.preventDefault(); delBtn.click(); return true; }
+      }
+    }
+    return false;
+  }
+
   /* Enter 키 처리: 체크리스트 추가/수정 입력 */
   document.addEventListener("keydown", function (e) {
+    if (handleGlobalShortcut(e)) return;
     if (e.key === "Enter" && e.target.matches("[data-cl-add-input]")) {
       e.preventDefault();
       var btn = document.querySelector("[data-cl='add'][data-ctx='" + e.target.dataset.ctx + "']");
